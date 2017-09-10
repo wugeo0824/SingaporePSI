@@ -1,12 +1,14 @@
 package com.xjcrepe.sgpsi.repo;
 
+import android.content.Context;
 import android.support.annotation.Nullable;
 
+import com.google.gson.Gson;
 import com.xjcrepe.sgpsi.model.PsiReadings;
 import com.xjcrepe.sgpsi.model.PsiReadingsType;
-import com.xjcrepe.sgpsi.network.PsiService;
 import com.xjcrepe.sgpsi.network.response.PsiReadingSetResponse;
 import com.xjcrepe.sgpsi.network.response.PsiResponse;
+import com.xjcrepe.sgpsi.utils.CommonUtils;
 
 import java.util.concurrent.Callable;
 
@@ -14,9 +16,6 @@ import javax.inject.Inject;
 
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Function;
-import io.reactivex.schedulers.Schedulers;
 
 import static com.xjcrepe.sgpsi.model.PsiReadingsType.CO8HourMax;
 import static com.xjcrepe.sgpsi.model.PsiReadingsType.COSubIndex;
@@ -29,16 +28,24 @@ import static com.xjcrepe.sgpsi.model.PsiReadingsType.PM25SubIndex;
 import static com.xjcrepe.sgpsi.model.PsiReadingsType.PSIDaily;
 import static com.xjcrepe.sgpsi.model.PsiReadingsType.SO2Daily;
 
-public class PsiReadingsRepository implements PsiReadingsDataSource {
+/**
+ * Created by LiXijun on 2017/9/10.
+ */
 
-    private final PsiService psiService;
+public class FakePsiReadingsRepository implements PsiReadingsDataSource {
 
-    @Nullable
     private PsiReadingSetResponse psiReadingSet;
 
     @Inject
-    public PsiReadingsRepository(PsiService psiService) {
-        this.psiService = psiService;
+    public FakePsiReadingsRepository(Context context) {
+        try {
+            String resultString = CommonUtils.getStringFromFile(context, "psi_200.json");
+            Gson gson = new Gson();
+            PsiResponse psiResponse = gson.fromJson(resultString, PsiResponse.class);
+            psiReadingSet = psiResponse.getItemsResponse().getReadingSet();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static SingleSource<? extends PsiReadings> getPsiReadingsSingleSource(@PsiReadingsType int readingType, PsiReadingSetResponse psiReadingSet) {
@@ -82,33 +89,12 @@ public class PsiReadingsRepository implements PsiReadingsDataSource {
     }
 
     @Override
-    public Single<PsiReadings> getPsiReadingsWithType(@PsiReadingsType final int readingType) {
-        if (psiReadingSet == null) {
-            return psiService.getPsi()
-                    .subscribeOn(Schedulers.io())
-                    .map(new Function<PsiResponse, PsiReadingSetResponse>() {
-                        @Override
-                        public PsiReadingSetResponse apply(PsiResponse psiResponse) throws Exception {
-                            if (psiResponse.getItemsResponse() != null &&
-                                    psiResponse.getItemsResponse().getReadingSet() != null) {
-                                psiReadingSet = psiResponse.getItemsResponse().getReadingSet();
-                            }
-                            return psiReadingSet;
-                        }
-                    }).flatMap(new Function<PsiReadingSetResponse, SingleSource<? extends PsiReadings>>() {
-                        @Override
-                        public SingleSource<? extends PsiReadings> apply(PsiReadingSetResponse psiReadingSetResponse) {
-                            return getPsiReadingsSingleSource(readingType, psiReadingSetResponse);
-                        }
-                    })
-                    .observeOn(AndroidSchedulers.mainThread());
-        } else {
-            return Single.defer(new Callable<SingleSource<? extends PsiReadings>>() {
-                @Override
-                public SingleSource<? extends PsiReadings> call() {
-                    return getPsiReadingsSingleSource(readingType, psiReadingSet);
-                }
-            });
-        }
+    public Single<PsiReadings> getPsiReadingsWithType(final int readingType) {
+        return Single.defer(new Callable<SingleSource<? extends PsiReadings>>() {
+            @Override
+            public SingleSource<? extends PsiReadings> call() {
+                return getPsiReadingsSingleSource(readingType, psiReadingSet);
+            }
+        });
     }
 }

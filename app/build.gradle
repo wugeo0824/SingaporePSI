@@ -22,14 +22,24 @@ android {
             includeAndroidResources = true
         }
     }
-}
 
-// so that our Robolectric tests can find generated classes
-android.applicationVariants.all { variant ->
-    if (variant.buildType.name == "debug") {
-        def aptOutputDir = new File(buildDir, "generated/source/apt/${variant.unitTestVariant.dirName}")
-        variant.unitTestVariant.addJavaSourceFoldersToModel(aptOutputDir)
-        assembleDebug.finalizedBy('assembleDebugUnitTest')
+    flavorDimensions "mode"
+    productFlavors {
+        mock {
+            applicationIdSuffix = ".mock"
+            dimension "mode"
+        }
+        prod {
+            dimension "mode"
+        }
+    }
+
+    // Remove mockRelease as it's not needed.
+    android.variantFilter { variant ->
+        if (variant.buildType.name == 'release'
+                && variant.getFlavors().get(0).name == 'mock') {
+            variant.setIgnore(true)
+        }
     }
 }
 
@@ -42,7 +52,6 @@ dependencies {
     // java unit tests
     testImplementation "junit:junit:$rootProject.ext.junitVersion"
     testImplementation "org.mockito:mockito-all:$rootProject.ext.mockitoVersion"
-    testImplementation "org.robolectric:robolectric:3.4.2"
 
     // android unit tests
     androidTestImplementation "junit:junit:$rootProject.ext.junitVersion"
@@ -63,7 +72,6 @@ dependencies {
 
     // dagger 2
     annotationProcessor "com.google.dagger:dagger-compiler:$rootProject.daggerVersion"
-    provided "org.glassfish:javax.annotation:10.0-b28"
     implementation "com.google.dagger:dagger:$rootProject.daggerVersion"
     implementation "com.google.dagger:dagger-android:$rootProject.daggerVersion"
     implementation "com.google.dagger:dagger-android-support:$rootProject.daggerVersion"

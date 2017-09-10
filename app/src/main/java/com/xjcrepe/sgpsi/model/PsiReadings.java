@@ -1,52 +1,44 @@
 package com.xjcrepe.sgpsi.model;
 
+import java.math.BigDecimal;
+
 /**
  * Created by LiXijun on 2017/9/9.
  */
 
 public class PsiReadings {
 
-    private float west;
+    private BigDecimal west;
 
-    private float east;
+    private BigDecimal east;
 
-    private float north;
+    private BigDecimal north;
 
-    private float south;
+    private BigDecimal south;
 
-    private float central;
-
-    private String typeName;
+    private BigDecimal central;
 
     public PsiReadings() {
     }
 
-    public float getWest() {
+    public BigDecimal getWest() {
         return west;
     }
 
-    public float getEast() {
+    public BigDecimal getEast() {
         return east;
     }
 
-    public float getNorth() {
+    public BigDecimal getNorth() {
         return north;
     }
 
-    public float getSouth() {
+    public BigDecimal getSouth() {
         return south;
     }
 
-    public float getCentral() {
+    public BigDecimal getCentral() {
         return central;
-    }
-
-    public String getTypeName() {
-        return typeName;
-    }
-
-    public void setTypeName(String typeName) {
-        this.typeName = typeName;
     }
 
     @Override
@@ -56,22 +48,20 @@ public class PsiReadings {
 
         PsiReadings that = (PsiReadings) o;
 
-        if (Float.compare(that.west, west) != 0) return false;
-        if (Float.compare(that.east, east) != 0) return false;
-        if (Float.compare(that.north, north) != 0) return false;
-        if (Float.compare(that.south, south) != 0) return false;
-        if (Float.compare(that.central, central) != 0) return false;
-        return typeName != null ? typeName.equals(that.typeName) : that.typeName == null;
+        if (west != null ? !west.equals(that.west) : that.west != null) return false;
+        if (east != null ? !east.equals(that.east) : that.east != null) return false;
+        if (north != null ? !north.equals(that.north) : that.north != null) return false;
+        if (south != null ? !south.equals(that.south) : that.south != null) return false;
+        return central != null ? central.equals(that.central) : that.central == null;
     }
 
     @Override
     public int hashCode() {
-        int result = (west != +0.0f ? Float.floatToIntBits(west) : 0);
-        result = 31 * result + (east != +0.0f ? Float.floatToIntBits(east) : 0);
-        result = 31 * result + (north != +0.0f ? Float.floatToIntBits(north) : 0);
-        result = 31 * result + (south != +0.0f ? Float.floatToIntBits(south) : 0);
-        result = 31 * result + (central != +0.0f ? Float.floatToIntBits(central) : 0);
-        result = 31 * result + (typeName != null ? typeName.hashCode() : 0);
+        int result = west != null ? west.hashCode() : 0;
+        result = 31 * result + (east != null ? east.hashCode() : 0);
+        result = 31 * result + (north != null ? north.hashCode() : 0);
+        result = 31 * result + (south != null ? south.hashCode() : 0);
+        result = 31 * result + (central != null ? central.hashCode() : 0);
         return result;
     }
 }

@@ -1,7 +1,10 @@
 package com.xjcrepe.sgpsi;
 
+import android.support.annotation.VisibleForTesting;
+
 import com.xjcrepe.sgpsi.di.AppComponent;
 import com.xjcrepe.sgpsi.di.DaggerAppComponent;
+import com.xjcrepe.sgpsi.repo.PsiReadingsRepository;
 
 import dagger.android.AndroidInjector;
 import dagger.android.support.DaggerApplication;

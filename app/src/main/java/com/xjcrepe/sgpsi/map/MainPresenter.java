@@ -4,7 +4,7 @@ import android.support.annotation.Nullable;
 
 import com.xjcrepe.sgpsi.model.PsiReadings;
 import com.xjcrepe.sgpsi.model.PsiReadingsType;
-import com.xjcrepe.sgpsi.repo.PsiReadingsRepository;
+import com.xjcrepe.sgpsi.repo.PsiReadingsDataSource;
 
 import javax.inject.Inject;
 
@@ -17,7 +17,7 @@ import io.reactivex.disposables.Disposable;
 
 public class MainPresenter implements MainContract.Presenter {
 
-    private final PsiReadingsRepository psiReadingsRepository;
+    private final PsiReadingsDataSource psiReadingsDataSource;
 
     @Nullable
     private MainContract.View view;
@@ -26,8 +26,8 @@ public class MainPresenter implements MainContract.Presenter {
     private Disposable psiReadingDisposable;
 
     @Inject
-    public MainPresenter(PsiReadingsRepository psiReadingsRepository) {
-        this.psiReadingsRepository = psiReadingsRepository;
+    public MainPresenter(PsiReadingsDataSource psiReadingsDataSource) {
+        this.psiReadingsDataSource = psiReadingsDataSource;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class MainPresenter implements MainContract.Presenter {
 
     @Override
     public void fetchPsiReadingsOfType(@PsiReadingsType int type) {
-        psiReadingsRepository.getPsiReadingsWithType(type)
+        psiReadingsDataSource.getPsiReadingsWithType(type)
                 .subscribe(new SingleObserver<PsiReadings>() {
                     @Override
                     public void onSubscribe(Disposable disposable) {

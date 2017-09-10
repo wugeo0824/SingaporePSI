@@ -7,12 +7,20 @@ import com.xjcrepe.sgpsi.network.response.PsiReadingSetResponse;
 import com.xjcrepe.sgpsi.network.response.PsiResponse;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.concurrent.Callable;
+
+import io.reactivex.Scheduler;
 import io.reactivex.Single;
+import io.reactivex.android.plugins.RxAndroidPlugins;
+import io.reactivex.functions.Function;
 import io.reactivex.observers.TestObserver;
+import io.reactivex.plugins.RxJavaPlugins;
+import io.reactivex.schedulers.Schedulers;
 
 import static com.xjcrepe.sgpsi.model.PsiReadingsType.O3SubIndex;
 import static org.mockito.Mockito.mock;
@@ -30,6 +38,23 @@ public class PsiReadingsRepositoryTest {
     private PsiResponse mockResponse;
 
     private PsiReadingsRepository subject;
+
+    @BeforeClass
+    public static void setupMainScheduler() {
+        RxAndroidPlugins.setInitMainThreadSchedulerHandler(new Function<Callable<Scheduler>, Scheduler>() {
+            @Override
+            public Scheduler apply(Callable<Scheduler> schedulerCallable) throws Exception {
+                return Schedulers.trampoline();
+            }
+        });
+
+        RxJavaPlugins.setIoSchedulerHandler(new Function<Scheduler, Scheduler>() {
+            @Override
+            public Scheduler apply(Scheduler scheduler) throws Exception {
+                return Schedulers.trampoline();
+            }
+        });
+    }
 
     @Before
     public void setUp() {
@@ -56,9 +81,9 @@ public class PsiReadingsRepositoryTest {
         when(itemsResponse.getReadingSet()).thenReturn(readingSetResponse);
         when(mockResponse.getItemsResponse()).thenReturn(itemsResponse);
         when(psiService.getPsi()).thenReturn(Single.just(mockResponse));
-        TestObserver<PsiReadings> testObserver = TestObserver.create();
 
-        subject.getPsiReadingsWithType(O3SubIndex).subscribe(testObserver);
+        TestObserver<PsiReadings> testObserver = subject.getPsiReadingsWithType(O3SubIndex).test();
+        testObserver.awaitTerminalEvent();
 
         testObserver.assertValue(o3SubIndex);
     }
@@ -73,10 +98,10 @@ public class PsiReadingsRepositoryTest {
         when(mockResponse.getItemsResponse()).thenReturn(itemsResponse);
         when(psiService.getPsi()).thenReturn(Single.just(mockResponse));
         subject.getPsiReadingsWithType(O3SubIndex).subscribe();
-        TestObserver<PsiReadings> testObserver = TestObserver.create();
         reset(psiService);
 
-        subject.getPsiReadingsWithType(O3SubIndex).subscribe(testObserver);
+        TestObserver<PsiReadings> testObserver = subject.getPsiReadingsWithType(O3SubIndex).test();
+        testObserver.awaitTerminalEvent();
 
         verify(psiService, never()).getPsi();
         testObserver.assertValue(o3SubIndex);
@@ -89,9 +114,9 @@ public class PsiReadingsRepositoryTest {
         when(itemsResponse.getReadingSet()).thenReturn(readingSetResponse);
         when(mockResponse.getItemsResponse()).thenReturn(itemsResponse);
         when(psiService.getPsi()).thenReturn(Single.just(mockResponse));
-        TestObserver<PsiReadings> testObserver = TestObserver.create();
 
-        subject.getPsiReadingsWithType(O3SubIndex).subscribe(testObserver);
+        TestObserver<PsiReadings> testObserver = subject.getPsiReadingsWithType(O3SubIndex).test();
+        testObserver.awaitTerminalEvent();
 
         testObserver.assertFailure(InvalidReadingTypeException.class);
     }
