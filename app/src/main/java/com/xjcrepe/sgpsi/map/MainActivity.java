@@ -1,9 +1,9 @@
 package com.xjcrepe.sgpsi.map;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -14,12 +14,14 @@ import android.widget.TextView;
 import com.xjcrepe.sgpsi.R;
 import com.xjcrepe.sgpsi.model.PsiReadings;
 
-import java.util.List;
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity implements MainContract.View, AdapterView.OnItemSelectedListener{
+public class MainActivity extends AppCompatActivity implements MainContract.View, AdapterView.OnItemSelectedListener {
+
+    private static final String KEY_CURRENT_READING_TYPE = "key_reading_type";
 
     @BindView(R.id.tvNorth)
     TextView tvNorth;
@@ -42,6 +44,9 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     @BindView(R.id.progressBar)
     ProgressBar progressBar;
 
+    @Inject
+    MainContract.Presenter presenter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +54,19 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         ButterKnife.bind(this);
 
         initViews();
+
+        // default to first element in the list
+        int readingType = 0;
+        if (savedInstanceState != null) {
+            readingType = savedInstanceState.getInt(KEY_CURRENT_READING_TYPE);
+        }
+        spinner.setSelection(readingType);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt(KEY_CURRENT_READING_TYPE, spinner.getSelectedItemPosition());
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -76,13 +94,13 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     }
 
     @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        presenter.fetchPsiReadingsOfType(position);
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
-
+        //No-op
     }
 
     private void initViews() {
