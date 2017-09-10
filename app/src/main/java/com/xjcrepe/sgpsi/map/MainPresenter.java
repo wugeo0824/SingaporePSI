@@ -17,10 +17,10 @@ import io.reactivex.disposables.Disposable;
 
 public class MainPresenter implements MainContract.Presenter {
 
+    private final PsiReadingsRepository psiReadingsRepository;
+
     @Nullable
     private MainContract.View view;
-
-    private final PsiReadingsRepository psiReadingsRepository;
 
     @Nullable
     private Disposable psiReadingDisposable;
@@ -37,7 +37,7 @@ public class MainPresenter implements MainContract.Presenter {
 
     @Override
     public void unbindView() {
-        if (psiReadingDisposable != null && !psiReadingDisposable.isDisposed()){
+        if (psiReadingDisposable != null && !psiReadingDisposable.isDisposed()) {
             psiReadingDisposable.dispose();
         }
         view = null;
@@ -49,7 +49,7 @@ public class MainPresenter implements MainContract.Presenter {
                 .subscribe(new SingleObserver<PsiReadings>() {
                     @Override
                     public void onSubscribe(Disposable disposable) {
-                        if (view == null){
+                        if (view == null) {
                             return;
                         }
                         view.showLoading();
@@ -58,7 +58,7 @@ public class MainPresenter implements MainContract.Presenter {
 
                     @Override
                     public void onSuccess(PsiReadings psiReadings) {
-                        if (view == null){
+                        if (view == null) {
                             return;
                         }
                         view.hideLoading();
@@ -67,13 +67,12 @@ public class MainPresenter implements MainContract.Presenter {
 
                     @Override
                     public void onError(Throwable e) {
-                        if (view == null){
+                        if (view == null) {
                             return;
                         }
                         view.hideLoading();
-                        view.showErrorMessage(e.getLocalizedMessage());
+                        view.showErrorMessage(e.getMessage());
                     }
                 });
     }
-
 }
