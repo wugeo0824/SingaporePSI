@@ -25,3 +25,19 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+// Define versions in a single place to avoid repeated copy-pastes
+ext {
+    // Sdk and tools
+    buildToolsVersion = '26.0.1'
+
+    // App dependencies
+    supportLibraryVersion = '26.0.2'
+    butterKnifeVersion = '8.6.0'
+    junitVersion = '4.12'
+    mockitoVersion = '1.10.19'
+    espressoVersion = '3.0.0'
+    daggerVersion = '2.11'
+    dexmakerVersion = '1.2'
+    retrofitVersion = '2.3.0'
+}

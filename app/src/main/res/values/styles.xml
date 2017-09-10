@@ -8,4 +8,10 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="LocationText">
+        <item name="android:paddingStart">@dimen/normal_padding</item>
+        <item name="android:paddingEnd">@dimen/normal_padding</item>
+        <item name="android:background">@drawable/bg_rounded_white</item>
+    </style>
+
 </resources>

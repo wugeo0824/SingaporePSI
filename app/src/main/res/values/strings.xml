@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">SGPSI</string>
+
+    <string name="abc_north">North</string>
+    <string name="abc_south">South</string>
+    <string name="abc_east">East</string>
+    <string name="abc_west">West</string>
+    <string name="abc_central">Central</string>
 </resources>
