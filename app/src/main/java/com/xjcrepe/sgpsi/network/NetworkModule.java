@@ -61,19 +61,20 @@ public class NetworkModule {
     @Singleton
     OkHttpClient provideOkHttpClient(final @Named("api_key") String apiKey) {
         return new OkHttpClient.Builder()
-                .addNetworkInterceptor(new Interceptor() {
+                .addInterceptor(new Interceptor() {
                     @Override
                     public Response intercept(@NonNull Chain chain) throws IOException {
                         Request original = chain.request();
 
                         // add the api key to each network call header
-                        Request.Builder requestBuild = original.newBuilder()
+                        Request.Builder requestBuilder = original.newBuilder()
                                 .header(PARAM_CONTENT_TYPE, CONTENT_TYPE_JSON)
                                 .addHeader(PARAM_API_KEY, apiKey);
 
-                        return chain.proceed(requestBuild.build());
+                        return chain.proceed(requestBuilder.build());
                     }
-                }).build();
+                })
+                .build();
     }
 
     @Provides

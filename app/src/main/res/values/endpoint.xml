@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="api_key"></string>
+    <string name="api_key">ZY37KE2leDxgMZLQGBSVifLkRg565DP0</string>
     <string name="base_url">https://api.data.gov.sg/</string>
 </resources>
